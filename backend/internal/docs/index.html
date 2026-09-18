@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MockHub · API 文档</title>
+  <style>
+    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; margin: 0; background: #f5f6f8; color: #1d2129; }
+    header { background: #0f172a; color: #fff; padding: 20px 32px; }
+    header h1 { margin: 0 0 4px; font-size: 20px; }
+    header p { margin: 0; color: #94a3b8; font-size: 13px; }
+    main { max-width: 960px; margin: 24px auto; padding: 0 16px; }
+    .card { background: #fff; border-radius: 8px; padding: 20px 24px; margin-bottom: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.06); }
+    h2 { font-size: 16px; margin: 0 0 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid #f0f1f3; }
+    th { color: #86909c; font-weight: 500; }
+    code { background: #f2f3f5; padding: 2px 6px; border-radius: 4px; font-size: 12px; }
+    .method { display: inline-block; min-width: 48px; text-align: center; padding: 2px 8px; border-radius: 4px; color: #fff; font-size: 12px; font-weight: 600; }
+    .GET { background: #00b42a; } .POST { background: #165dff; } .PUT { background: #ff7d00; }
+    .DELETE { background: #f53f3f; } .PATCH { background: #722ed1; } .ANY { background: #86909c; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MockHub · 在线 API Mock 服务 API 文档</h1>
+    <p>Go 1.22 + Gin + GORM · OpenAPI: <a style="color:#93c5fd" href="/docs/openapi.json">/docs/openapi.json</a></p>
+  </header>
+  <main>
+    <div class="card">
+      <h2>认证</h2>
+      <table>
+        <tr><th>方法</th><th>路径</th><th>说明</th></tr>
+        <tr><td><span class="method POST">POST</span></td><td><code>/api/v1/auth/register</code></td><td>注册账号（username + password）</td></tr>
+        <tr><td><span class="method POST">POST</span></td><td><code>/api/v1/auth/login</code></td><td>登录，返回 JWT token 与用户信息</td></tr>
+        <tr><td><span class="method GET">GET</span></td><td><code>/api/v1/auth/me</code></td><td>获取当前登录用户（需 Bearer token）</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Mock 项目</h2>
+      <table>
+        <tr><th>方法</th><th>路径</th><th>说明</th></tr>
+        <tr><td><span class="method GET">GET</span></td><td><code>/api/v1/projects</code></td><td>项目列表</td></tr>
+        <tr><td><span class="method POST">POST</span></td><td><code>/api/v1/projects</code></td><td>创建项目</td></tr>
+        <tr><td><span class="method GET">GET</span></td><td><code>/api/v1/projects/:id</code></td><td>项目详情</td></tr>
+        <tr><td><span class="method PUT">PUT</span></td><td><code>/api/v1/projects/:id</code></td><td>更新项目</td></tr>
+        <tr><td><span class="method DELETE">DELETE</span></td><td><code>/api/v1/projects/:id</code></td><td>删除项目</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2>Mock 接口配置</h2>
+      <table>
+        <tr><th>方法</th><th>路径</th><th>说明</th></tr>
+        <tr><td><span class="method GET">GET</span></td><td><code>/api/v1/projects/:projectId/apis</code></td><td>接口列表</td></tr>
+        <tr><td><span class="method POST">POST</span></td><td><code>/api/v1/projects/:projectId/apis</code></td><td>新建接口</td></tr>
+        <tr><td><span class="method PUT">PUT</span></td><td><code>/api/v1/projects/:projectId/apis/:id</code></td><td>更新接口</td></tr>
+        <tr><td><span class="method DELETE">DELETE</span></td><td><code>/api/v1/projects/:projectId/apis/:id</code></td><td>删除接口</td></tr>
+        <tr><td><span class="method POST">POST</span></td><td><code>/api/v1/projects/:projectId/swagger/import</code></td><td>导入 OpenAPI 文档自动生成接口</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2>请求日志</h2>
+      <table>
+        <tr><th>方法</th><th>路径</th><th>说明</th></tr>
+        <tr><td><span class="method GET">GET</span></td><td><code>/api/v1/projects/:projectId/logs</code></td><td>分页查看请求日志</td></tr>
+        <tr><td><span class="method DELETE">DELETE</span></td><td><code>/api/v1/projects/:projectId/logs</code></td><td>清空请求日志</td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <h2>公开 Mock 引擎</h2>
+      <table>
+        <tr><th>方法</th><th>路径</th><th>说明</th></tr>
+        <tr><td><span class="method ANY">ANY</span></td><td><code>/mock/:projectId/*path</code></td><td>发送 Mock 请求（动态/条件响应、延迟模拟）</td></tr>
+        <tr><td><span class="method GET">GET</span></td><td><code>/healthz</code></td><td>健康检查</td></tr>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

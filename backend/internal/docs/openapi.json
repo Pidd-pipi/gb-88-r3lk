@@ -1,0 +1,18 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "MockHub · 在线 API Mock 服务", "version": "1.0.0", "description": "MockHub - Go 1.22 + Gin + GORM" },
+  "paths": {
+    "/api/v1/auth/register": { "post": { "summary": "注册" } },
+    "/api/v1/auth/login": { "post": { "summary": "登录" } },
+    "/api/v1/auth/me": { "get": { "summary": "当前用户", "security": [{ "bearerAuth": [] }] } },
+    "/api/v1/projects": { "get": { "summary": "项目列表" }, "post": { "summary": "创建项目" } },
+    "/api/v1/projects/{id}": { "get": { "summary": "项目详情" }, "put": { "summary": "更新项目" }, "delete": { "summary": "删除项目" } },
+    "/api/v1/projects/{projectId}/apis": { "get": { "summary": "接口列表" }, "post": { "summary": "新建接口" } },
+    "/api/v1/projects/{projectId}/apis/{id}": { "get": { "summary": "接口详情" }, "put": { "summary": "更新接口" }, "delete": { "summary": "删除接口" } },
+    "/api/v1/projects/{projectId}/swagger/import": { "post": { "summary": "导入 OpenAPI" } },
+    "/api/v1/projects/{projectId}/logs": { "get": { "summary": "请求日志" }, "delete": { "summary": "清空日志" } },
+    "/mock/{projectId}/{path}": { "get": { "summary": "Mock 引擎" }, "post": { "summary": "Mock 引擎" } },
+    "/healthz": { "get": { "summary": "健康检查" } }
+  },
+  "components": { "securitySchemes": { "bearerAuth": { "type": "http", "scheme": "bearer" } } }
+}
