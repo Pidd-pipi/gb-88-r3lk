@@ -17,6 +17,9 @@ func registerEndpoint(api *gin.RouterGroup, h *Handlers, cfg *config.Config, log
 		apis.GET("/:id", h.Endpoint.Get)
 		apis.PUT("/:id", h.Endpoint.Update)
 		apis.DELETE("/:id", h.Endpoint.Delete)
+		apis.GET("/:id/versions", h.Endpoint.ListVersions)
+		apis.GET("/:id/versions/:version", h.Endpoint.GetVersion)
+		apis.POST("/:id/versions/:version/publish", h.Endpoint.PublishVersion)
 	}
 
 	api.POST("/projects/:projectId/swagger/import", middleware.JWTAuth(cfg, logger), h.Endpoint.ImportSwagger)

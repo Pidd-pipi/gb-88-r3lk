@@ -27,6 +27,9 @@
                 {{ log.method }}
               </a-tag>
               <code class="log-path">{{ log.path }}</code>
+              <a-tag v-if="log.apiVersion" color="arcoblue" size="small">
+                v{{ log.apiVersion }}
+              </a-tag>
               <a-tag :color="getStatusCodeColor(log.responseStatus)" size="small">
                 {{ log.responseStatus }}
               </a-tag>

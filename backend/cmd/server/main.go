@@ -53,6 +53,7 @@ func run(logger *slog.Logger) error {
 		&model.User{},
 		&model.Project{},
 		&model.MockAPI{},
+		&model.APIVersion{},
 		&model.ResponseTemplate{},
 		&model.RequestLog{},
 	); err != nil {
@@ -64,7 +65,16 @@ func run(logger *slog.Logger) error {
 		return fmt.Errorf("seed data: %w", err)
 	}
 
-	h := buildHandlers(cfg, db, logger)
+	h, endpointSvc := buildHandlers(cfg, db, logger)
+
+	// Snapshot pre-versioning endpoints into v1 rows. A failure only logs a
+	// warning: the edit path tolerates legacy rows, so upgrades never block.
+	if n, err := endpointSvc.BackfillLegacyVersions(); err != nil {
+		logger.Warn("backfill legacy endpoint versions failed", "error", err)
+	} else if n > 0 {
+		logger.Info("legacy endpoint versions backfilled", "count", n)
+	}
+
 	engine := router.New(cfg, logger, h)
 
 	srv := &http.Server{
@@ -138,15 +148,16 @@ func openDB(cfg *config.Config, logger *slog.Logger) (*gorm.DB, error) {
 	return db, nil
 }
 
-func buildHandlers(cfg *config.Config, db *gorm.DB, logger *slog.Logger) *router.Handlers {
+func buildHandlers(cfg *config.Config, db *gorm.DB, logger *slog.Logger) (*router.Handlers, *service.EndpointService) {
 	userRepo := repository.NewUserRepository(db)
 	projectRepo := repository.NewProjectRepository(db)
 	endpointRepo := repository.NewEndpointRepository(db)
+	versionRepo := repository.NewAPIVersionRepository(db)
 	logRepo := repository.NewRequestLogRepository(db)
 
 	authSvc := service.NewAuthService(cfg, userRepo, logger)
 	projectSvc := service.NewProjectService(projectRepo, logger)
-	endpointSvc := service.NewEndpointService(projectRepo, endpointRepo, logger)
+	endpointSvc := service.NewEndpointService(projectRepo, endpointRepo, versionRepo, userRepo, logger)
 	logSvc := service.NewRequestLogService(projectRepo, logRepo, logger)
 	mockEngine := service.NewMockEngine(endpointRepo, logRepo, logger)
 
@@ -157,5 +168,5 @@ func buildHandlers(cfg *config.Config, db *gorm.DB, logger *slog.Logger) *router
 		Endpoint:   handler.NewEndpointHandler(endpointSvc, logger),
 		Mock:       handler.NewMockHandler(mockEngine, logger),
 		RequestLog: handler.NewRequestLogHandler(logSvc, logger),
-	}
+	}, endpointSvc
 }

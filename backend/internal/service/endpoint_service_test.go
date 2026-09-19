@@ -13,7 +13,9 @@ func TestEndpointServiceCRUDAndAccess(t *testing.T) {
 	db := newTestDB(t)
 	projects := repository.NewProjectRepository(db)
 	endpoints := repository.NewEndpointRepository(db)
-	svc := NewEndpointService(projects, endpoints, discardLogger())
+	versions := repository.NewAPIVersionRepository(db)
+	users := repository.NewUserRepository(db)
+	svc := NewEndpointService(projects, endpoints, versions, users, discardLogger())
 
 	dev := createUser(t, db, "dev", RoleDev)
 	other := createUser(t, db, "other", RoleDev)
@@ -82,7 +84,9 @@ func TestEndpointServiceImportOpenAPI(t *testing.T) {
 	db := newTestDB(t)
 	projects := repository.NewProjectRepository(db)
 	endpoints := repository.NewEndpointRepository(db)
-	svc := NewEndpointService(projects, endpoints, discardLogger())
+	versions := repository.NewAPIVersionRepository(db)
+	users := repository.NewUserRepository(db)
+	svc := NewEndpointService(projects, endpoints, versions, users, discardLogger())
 	dev := createUser(t, db, "dev", RoleDev)
 	project, _ := NewProjectService(projects, discardLogger()).Create("p", "d", dev.ID, "http://localhost:3119")
 

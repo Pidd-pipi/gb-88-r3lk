@@ -111,6 +111,72 @@ func (h *EndpointHandler) Delete(c *gin.Context) {
 	util.OK(c, gin.H{"deleted": true})
 }
 
+// ListVersions handles GET /projects/:projectId/apis/:id/versions.
+func (h *EndpointHandler) ListVersions(c *gin.Context) {
+	projectID, ok := parseID(c)
+	if !ok {
+		return
+	}
+	id, ok := parseIDParam(c, "id")
+	if !ok {
+		return
+	}
+	versions, err := h.svc.ListVersions(projectID, id, middleware.GetUserID(c), middleware.GetRole(c))
+	if err != nil {
+		util.Fail(c, err)
+		return
+	}
+	util.OK(c, versions)
+}
+
+// GetVersion handles GET /projects/:projectId/apis/:id/versions/:version.
+func (h *EndpointHandler) GetVersion(c *gin.Context) {
+	projectID, ok := parseID(c)
+	if !ok {
+		return
+	}
+	id, ok := parseIDParam(c, "id")
+	if !ok {
+		return
+	}
+	version, ok := parseVersion(c)
+	if !ok {
+		return
+	}
+	v, err := h.svc.GetVersion(projectID, id, version, middleware.GetUserID(c), middleware.GetRole(c))
+	if err != nil {
+		util.Fail(c, err)
+		return
+	}
+	util.OK(c, v)
+}
+
+// PublishVersion handles POST /projects/:projectId/apis/:id/versions/:version/publish.
+func (h *EndpointHandler) PublishVersion(c *gin.Context) {
+	projectID, ok := parseID(c)
+	if !ok {
+		return
+	}
+	id, ok := parseIDParam(c, "id")
+	if !ok {
+		return
+	}
+	version, ok := parseVersion(c)
+	if !ok {
+		return
+	}
+	var req dto.PublishVersionRequest
+	if !util.BindAndValidate(c, &req) {
+		return
+	}
+	api, err := h.svc.PublishVersion(projectID, id, version, middleware.GetUserID(c), middleware.GetRole(c), *req.BaseVersion)
+	if err != nil {
+		util.Fail(c, err)
+		return
+	}
+	util.OK(c, api)
+}
+
 // ImportSwagger handles POST /projects/:projectId/swagger/import.
 func (h *EndpointHandler) ImportSwagger(c *gin.Context) {
 	projectID, ok := parseID(c)

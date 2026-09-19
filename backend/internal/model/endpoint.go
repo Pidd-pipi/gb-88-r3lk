@@ -16,19 +16,23 @@ type ConditionRule struct {
 	StatusCode   int    `json:"statusCode"`
 }
 
-// MockAPI is a configurable mock endpoint under a project.
+// MockAPI is a configurable mock endpoint under a project. The content columns
+// always mirror the currently published version; CurrentVersion points at the
+// immutable APIVersion row that is live. A zero CurrentVersion marks legacy
+// data created before versioning existed.
 type MockAPI struct {
-	ID                uint              `gorm:"primaryKey" json:"_id,string"`
-	ProjectID         uint              `gorm:"index;not null" json:"projectId,string"`
-	Path              string            `gorm:"size:255;not null" json:"path"`
-	Method            string            `gorm:"size:16;not null" json:"method"`
-	StatusCode        int               `gorm:"not null;default:200" json:"statusCode"`
-	ResponseBody      string            `gorm:"type:text" json:"responseBody"`
-	ResponseHeadersJS string            `gorm:"column:response_headers;type:text" json:"-"`
-	Delay             int               `gorm:"not null;default:0" json:"delay"`
-	ConditionsJS      string            `gorm:"column:conditions;type:text" json:"-"`
-	CreatedAt         time.Time         `json:"createdAt"`
-	UpdatedAt         time.Time         `json:"-"`
+	ID                uint      `gorm:"primaryKey" json:"_id,string"`
+	ProjectID         uint      `gorm:"index;not null" json:"projectId,string"`
+	Path              string    `gorm:"size:255;not null" json:"path"`
+	Method            string    `gorm:"size:16;not null" json:"method"`
+	StatusCode        int       `gorm:"not null;default:200" json:"statusCode"`
+	ResponseBody      string    `gorm:"type:text" json:"responseBody"`
+	ResponseHeadersJS string    `gorm:"column:response_headers;type:text" json:"-"`
+	Delay             int       `gorm:"not null;default:0" json:"delay"`
+	ConditionsJS      string    `gorm:"column:conditions;type:text" json:"-"`
+	CurrentVersion    int       `gorm:"not null;default:0" json:"currentVersion"`
+	CreatedAt         time.Time `json:"createdAt"`
+	UpdatedAt         time.Time `json:"-"`
 
 	// Computed fields (not persisted).
 	ResponseHeaders map[string]string `gorm:"-" json:"responseHeaders"`

@@ -23,6 +23,7 @@ func newTestDB(t *testing.T) *gorm.DB {
 		&model.User{},
 		&model.Project{},
 		&model.MockAPI{},
+		&model.APIVersion{},
 		&model.ResponseTemplate{},
 		&model.RequestLog{},
 	); err != nil {

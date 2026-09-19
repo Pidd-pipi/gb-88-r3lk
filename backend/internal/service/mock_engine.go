@@ -20,6 +20,7 @@ type MockResult struct {
 	Body         string
 	Headers      map[string]string
 	MatchedAPIID uint
+	APIVersion   int
 }
 
 // MockEngine renders dynamic mock responses and records request logs.
@@ -91,10 +92,11 @@ func (e *MockEngine) Handle(projectID uint, method, path string, query map[strin
 		time.Sleep(time.Duration(endpoint.Delay) * time.Millisecond)
 	}
 
-	// Record the request log.
+	// Record the request log with the version that actually served it.
 	logEntry := &model.RequestLog{
 		ProjectID:      projectID,
 		APIID:          endpoint.ID,
+		APIVersion:     endpoint.CurrentVersion,
 		Method:         method,
 		Path:           path,
 		Headers:        headers,
@@ -116,6 +118,7 @@ func (e *MockEngine) Handle(projectID uint, method, path string, query map[strin
 		Body:         responseBody,
 		Headers:      respHeaders,
 		MatchedAPIID: endpoint.ID,
+		APIVersion:   endpoint.CurrentVersion,
 	}, nil
 }
 

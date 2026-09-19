@@ -7,19 +7,22 @@ import (
 	"gorm.io/gorm"
 )
 
-// RequestLog records every request received by the mock engine.
+// RequestLog records every request received by the mock engine. APIVersion
+// captures the endpoint version that actually served the request, so the log
+// stays truthful after rollbacks; zero means the request predates versioning.
 type RequestLog struct {
-	ID             uint              `gorm:"primaryKey" json:"_id,string"`
-	ProjectID      uint              `gorm:"index;not null" json:"projectId,string"`
-	APIID          uint              `gorm:"index" json:"apiId,string,omitempty"`
-	Method         string            `gorm:"size:16" json:"method"`
-	Path           string            `gorm:"size:512" json:"path"`
-	HeadersJS      string            `gorm:"column:headers;type:text" json:"-"`
-	BodyJS         string            `gorm:"column:body;type:text" json:"-"`
-	QueryJS        string            `gorm:"column:query;type:text" json:"-"`
-	ResponseStatus int               `json:"responseStatus"`
-	ResponseBodyJS string            `gorm:"column:response_body;type:text" json:"-"`
-	CreatedAt      time.Time         `json:"createdAt"`
+	ID             uint      `gorm:"primaryKey" json:"_id,string"`
+	ProjectID      uint      `gorm:"index;not null" json:"projectId,string"`
+	APIID          uint      `gorm:"index" json:"apiId,string,omitempty"`
+	APIVersion     int       `gorm:"not null;default:0" json:"apiVersion"`
+	Method         string    `gorm:"size:16" json:"method"`
+	Path           string    `gorm:"size:512" json:"path"`
+	HeadersJS      string    `gorm:"column:headers;type:text" json:"-"`
+	BodyJS         string    `gorm:"column:body;type:text" json:"-"`
+	QueryJS        string    `gorm:"column:query;type:text" json:"-"`
+	ResponseStatus int       `json:"responseStatus"`
+	ResponseBodyJS string    `gorm:"column:response_body;type:text" json:"-"`
+	CreatedAt      time.Time `json:"createdAt"`
 
 	// Computed fields (not persisted).
 	Headers      map[string]string `gorm:"-" json:"headers"`

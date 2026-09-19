@@ -65,5 +65,7 @@ func (h *MockHandler) Serve(c *gin.Context) {
 	for k, v := range result.Headers {
 		c.Header(k, v)
 	}
+	// Expose the version that actually served this request for traceability.
+	c.Header("X-Mock-Version", strconv.Itoa(result.APIVersion))
 	c.Data(result.StatusCode, "application/json; charset=utf-8", []byte(result.Body))
 }

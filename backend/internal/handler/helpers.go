@@ -32,3 +32,13 @@ func parseIDParam(c *gin.Context, name string) (uint, bool) {
 	}
 	return uint(id), true
 }
+
+// parseVersion extracts the :version path parameter as a positive int.
+func parseVersion(c *gin.Context) (int, bool) {
+	n, err := strconv.Atoi(c.Param("version"))
+	if err != nil || n < 1 {
+		util.Fail(c, constants.NewAppError(constants.CodeBadRequest, "无效的版本号"))
+		return 0, false
+	}
+	return n, true
+}

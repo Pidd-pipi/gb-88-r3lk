@@ -120,15 +120,23 @@ func (s *SeedService) EnsureSeedData(ctx context.Context) error {
 		},
 	}
 	for _, ep := range endpoints {
+		ep.CurrentVersion = 1
 		if err := s.db.WithContext(ctx).Create(ep).Error; err != nil {
 			return fmt.Errorf("seed: create endpoint: %w", err)
 		}
+		v := newVersionSnapshot(1, ep, lead.ID, lead.Username)
+		if err := s.db.WithContext(ctx).Create(v).Error; err != nil {
+			return fmt.Errorf("seed: create endpoint version: %w", err)
+		}
 	}
 
-	// Seed 10 request log samples.
+	// Seed 10 request log samples against GET /api/users/:id (endpoints[1]).
+	usersByID := endpoints[1]
 	for i := 1; i <= 10; i++ {
 		logEntry := &model.RequestLog{
 			ProjectID:      project.ID,
+			APIID:          usersByID.ID,
+			APIVersion:     usersByID.CurrentVersion,
 			Method:         "GET",
 			Path:           fmt.Sprintf("/api/users/%d", i),
 			Headers:        map[string]string{"Accept": "application/json", "User-Agent": "seed/1.0"},

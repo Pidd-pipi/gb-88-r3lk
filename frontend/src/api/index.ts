@@ -1,5 +1,5 @@
 import axios from 'axios';
-import type { User, Project, MockAPI, RequestLog, Pagination, ApiResponse } from '../types';
+import type { User, Project, MockAPI, APIVersion, RequestLog, Pagination, ApiResponse } from '../types';
 
 // The Go backend wraps every response in { code, message, data }.
 // This interceptor normalizes it to the frontend's { success, data, message } shape.
@@ -76,9 +76,15 @@ export const mockApiApi = {
   getAPI: (projectId: string, id: string) => api.get<ApiResponse<MockAPI>>(`/projects/${projectId}/apis/${id}`),
   createAPI: (projectId: string, data: Partial<MockAPI>) =>
     api.post<ApiResponse<MockAPI>>(`/projects/${projectId}/apis`, data),
-  updateAPI: (projectId: string, id: string, data: Partial<MockAPI>) =>
+  updateAPI: (projectId: string, id: string, data: Partial<MockAPI> & { baseVersion?: number }) =>
     api.put<ApiResponse<MockAPI>>(`/projects/${projectId}/apis/${id}`, data),
-  deleteAPI: (projectId: string, id: string) => api.delete<ApiResponse<void>>(`/projects/${projectId}/apis/${id}`)
+  deleteAPI: (projectId: string, id: string) => api.delete<ApiResponse<void>>(`/projects/${projectId}/apis/${id}`),
+  getVersions: (projectId: string, apiId: string) =>
+    api.get<ApiResponse<APIVersion[]>>(`/projects/${projectId}/apis/${apiId}/versions`),
+  getVersion: (projectId: string, apiId: string, version: number) =>
+    api.get<ApiResponse<APIVersion>>(`/projects/${projectId}/apis/${apiId}/versions/${version}`),
+  publishVersion: (projectId: string, apiId: string, version: number, baseVersion: number) =>
+    api.post<ApiResponse<MockAPI>>(`/projects/${projectId}/apis/${apiId}/versions/${version}/publish`, { baseVersion })
 };
 
 export const requestLogApi = {

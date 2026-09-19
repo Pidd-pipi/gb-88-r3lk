@@ -11,18 +11,18 @@
     <a-card :loading="projectStore.loading">
       <a-table :data="projectStore.projects" :pagination="false">
         <template #columns>
-          <a-table-column title="项目名称" data-index="name" width="200" />
+          <a-table-column title="项目名称" data-index="name" :width="200" />
           <a-table-column title="描述" data-index="description">
             <template #cell="{ record }">
               {{ record.description || '暂无描述' }}
             </template>
           </a-table-column>
-          <a-table-column title="创建时间" data-index="createdAt" width="200">
+          <a-table-column title="创建时间" data-index="createdAt" :width="200">
             <template #cell="{ record }">
               {{ formatDate(record.createdAt) }}
             </template>
           </a-table-column>
-          <a-table-column title="操作" width="150">
+          <a-table-column title="操作" :width="150">
             <template #cell="{ record }">
               <a-space>
                 <a-button type="text" size="small" @click="goToProject(record)">

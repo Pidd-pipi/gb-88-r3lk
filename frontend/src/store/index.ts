@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import type { User, Project, MockAPI, RequestLog } from '../types';
+import type { User, Project, MockAPI, APIVersion, RequestLog } from '../types';
 import { authApi, projectApi, mockApiApi, requestLogApi } from '../api';
 
 interface AuthState {
@@ -54,6 +54,7 @@ interface ProjectState {
   projects: Project[];
   currentProject: Project | null;
   apis: MockAPI[];
+  versions: APIVersion[];
   logs: RequestLog[];
   loading: boolean;
 }
@@ -63,6 +64,7 @@ export const useProjectStore = defineStore('project', {
     projects: [],
     currentProject: null,
     apis: [],
+    versions: [],
     logs: [],
     loading: false
   }),
@@ -120,7 +122,7 @@ export const useProjectStore = defineStore('project', {
       return response.data;
     },
 
-    async updateAPI(projectId: string, id: string, data: Partial<MockAPI>) {
+    async updateAPI(projectId: string, id: string, data: Partial<MockAPI> & { baseVersion?: number }) {
       const response = await mockApiApi.updateAPI(projectId, id, data);
       if (response.data.success) {
         const index = this.apis.findIndex((a) => a._id === id);
@@ -135,6 +137,25 @@ export const useProjectStore = defineStore('project', {
       const response = await mockApiApi.deleteAPI(projectId, id);
       if (response.data.success) {
         this.apis = this.apis.filter((a) => a._id !== id);
+      }
+      return response.data;
+    },
+
+    async fetchVersions(projectId: string, apiId: string) {
+      const response = await mockApiApi.getVersions(projectId, apiId);
+      if (response.data.success) {
+        this.versions = response.data.data!;
+      }
+      return response.data;
+    },
+
+    async publishVersion(projectId: string, apiId: string, version: number, baseVersion: number) {
+      const response = await mockApiApi.publishVersion(projectId, apiId, version, baseVersion);
+      if (response.data.success) {
+        const index = this.apis.findIndex((a) => a._id === apiId);
+        if (index !== -1) {
+          this.apis[index] = response.data.data!;
+        }
       }
       return response.data;
     },
