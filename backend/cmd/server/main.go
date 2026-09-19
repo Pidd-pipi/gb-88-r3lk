@@ -53,6 +53,7 @@ func run(logger *slog.Logger) error {
 		&model.User{},
 		&model.Project{},
 		&model.MockAPI{},
+		&model.MockAPIVersion{},
 		&model.ResponseTemplate{},
 		&model.RequestLog{},
 	); err != nil {
@@ -142,11 +143,12 @@ func buildHandlers(cfg *config.Config, db *gorm.DB, logger *slog.Logger) *router
 	userRepo := repository.NewUserRepository(db)
 	projectRepo := repository.NewProjectRepository(db)
 	endpointRepo := repository.NewEndpointRepository(db)
+	versionRepo := repository.NewEndpointVersionRepository(db)
 	logRepo := repository.NewRequestLogRepository(db)
 
 	authSvc := service.NewAuthService(cfg, userRepo, logger)
 	projectSvc := service.NewProjectService(projectRepo, logger)
-	endpointSvc := service.NewEndpointService(projectRepo, endpointRepo, logger)
+	endpointSvc := service.NewEndpointService(projectRepo, endpointRepo, versionRepo, userRepo, logger)
 	logSvc := service.NewRequestLogService(projectRepo, logRepo, logger)
 	mockEngine := service.NewMockEngine(endpointRepo, logRepo, logger)
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -91,10 +92,12 @@ func (e *MockEngine) Handle(projectID uint, method, path string, query map[strin
 		time.Sleep(time.Duration(endpoint.Delay) * time.Millisecond)
 	}
 
-	// Record the request log.
+	// Record the request log, including the endpoint version that actually
+	// served the response so it stays auditable after later edits/rollbacks.
 	logEntry := &model.RequestLog{
 		ProjectID:      projectID,
 		APIID:          endpoint.ID,
+		APIVersion:     endpoint.CurrentVersion,
 		Method:         method,
 		Path:           path,
 		Headers:        headers,
@@ -107,7 +110,10 @@ func (e *MockEngine) Handle(projectID uint, method, path string, query map[strin
 		e.logger.Warn("record request log failed", "error", err)
 	}
 
-	respHeaders := map[string]string{"Content-Type": "application/json; charset=utf-8"}
+	respHeaders := map[string]string{
+		"Content-Type":       "application/json; charset=utf-8",
+		"X-Mock-API-Version": strconv.Itoa(endpoint.CurrentVersion),
+	}
 	for k, v := range endpoint.ResponseHeaders {
 		respHeaders[k] = v
 	}

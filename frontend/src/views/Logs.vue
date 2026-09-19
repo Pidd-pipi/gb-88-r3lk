@@ -30,6 +30,10 @@
               <a-tag :color="getStatusCodeColor(log.responseStatus)" size="small">
                 {{ log.responseStatus }}
               </a-tag>
+              <a-tooltip :content="log.apiVersion > 0 ? '实际生效的接口版本' : '该请求由未版本化的旧接口处理'">
+                <a-tag v-if="log.apiVersion > 0" color="purple" size="small">v{{ log.apiVersion }}</a-tag>
+                <a-tag v-else size="small">—</a-tag>
+              </a-tooltip>
               <span class="log-time">{{ formatDate(log.createdAt) }}</span>
             </div>
             <a-collapse bordered>

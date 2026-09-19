@@ -41,6 +41,8 @@ func Fail(c *gin.Context, err error) {
 	switch {
 	case errors.Is(err, repository.ErrNotFound):
 		status, code, message = http.StatusOK, constants.CodeNotFound, constants.MsgNotFound
+	case errors.Is(err, repository.ErrVersionConflict):
+		status, code, message = http.StatusConflict, constants.CodeConflict, constants.MsgVersionConflict
 	case errors.Is(err, constants.ErrUnauthorized):
 		status, code, message = http.StatusUnauthorized, constants.CodeUnauthorized, constants.MsgUnauthorized
 	case errors.Is(err, constants.ErrForbidden):

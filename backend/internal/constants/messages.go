@@ -12,4 +12,5 @@ const (
 	MsgLoginFailed     = "用户名或密码错误"
 	MsgInternalError   = "服务器内部错误"
 	MsgTooManyRequests = "请求过于频繁，请稍后再试"
+	MsgVersionConflict = "接口版本已被他人变更，请刷新后重试"
 )

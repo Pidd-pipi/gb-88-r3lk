@@ -9,6 +9,7 @@ import (
 
 	"github.com/mockhub/mockhub/internal/config"
 	"github.com/mockhub/mockhub/internal/model"
+	"github.com/mockhub/mockhub/internal/repository"
 )
 
 func newTestDB(t *testing.T) *gorm.DB {
@@ -23,12 +24,25 @@ func newTestDB(t *testing.T) *gorm.DB {
 		&model.User{},
 		&model.Project{},
 		&model.MockAPI{},
+		&model.MockAPIVersion{},
 		&model.ResponseTemplate{},
 		&model.RequestLog{},
 	); err != nil {
 		t.Fatalf("auto migrate: %v", err)
 	}
 	return db
+}
+
+// newEndpointService wires an EndpointService with all of its repositories
+// backed by the test database.
+func newEndpointService(db *gorm.DB) *EndpointService {
+	return NewEndpointService(
+		repository.NewProjectRepository(db),
+		repository.NewEndpointRepository(db),
+		repository.NewEndpointVersionRepository(db),
+		repository.NewUserRepository(db),
+		discardLogger(),
+	)
 }
 
 func newTestConfig() *config.Config {

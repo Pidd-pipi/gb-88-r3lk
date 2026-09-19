@@ -22,9 +22,13 @@ docker compose up -d --build
 
 - Mock 项目管理：创建项目自动生成 Base URL（`/mock/{projectId}`）
 - 接口配置：路径 / 方法 / 状态码 / 响应体（JSON）/ 响应头 / 延迟
+- 接口版本：每次编辑生成不可变新版本（记录操作人与时间），列表展示当前版本，历史版本可预览、可一键发布回滚
+- 并发安全：编辑/发布基于 `current_version` 乐观锁（CAS），并发发布同一接口只有一个成功，失败请求不改动当前版本
+- 版本可观测：Mock 响应携带 `X-Mock-API-Version` 响应头，请求日志持久化实际生效版本，页面刷新后可回读
+- 平滑升级：版本功能上线前的旧接口（无版本数据）可正常编辑，首次编辑自动把旧内容回填为 v1
 - 动态响应：`{{name.fullName}}`、`{{internet.email}}`、`{{repeat 5|...}}` 等 gofakeit 模板
 - 条件响应：按 query/body 字段匹配返回不同响应（如 `role=admin`）
-- 请求日志：记录方法、路径、Headers、Body、Query、响应状态与响应体
+- 请求日志：记录方法、路径、Headers、Body、Query、响应状态、响应体与生效版本
 - Swagger/OpenAPI 导入：上传 OpenAPI 2.0/3.0 JSON 自动生成接口
 - 鉴权：JWT + RBAC（lead 管理员 / dev 普通用户）
 - 可靠性：登录/注册与 Mock 接口分路由限流、结构化访问日志、优雅关闭、MySQL 连接池与启动重试
@@ -135,8 +139,10 @@ npm run dev
 | GET | /api/v1/auth/me | 当前用户 |
 | GET/POST | /api/v1/projects | 项目列表 / 创建 |
 | GET/PUT/DELETE | /api/v1/projects/:id | 项目详情 / 更新 / 删除 |
-| GET/POST | /api/v1/projects/:projectId/apis | 接口列表 / 新建 |
-| GET/PUT/DELETE | /api/v1/projects/:projectId/apis/:id | 接口详情 / 更新 / 删除 |
+| GET/POST | /api/v1/projects/:projectId/apis | 接口列表（含当前版本）/ 新建（生成 v1） |
+| GET/PUT/DELETE | /api/v1/projects/:projectId/apis/:id | 接口详情 / 更新（生成新版本，可带 `baseVersion` 乐观锁）/ 删除 |
+| GET | /api/v1/projects/:projectId/apis/:id/versions | 接口历史版本列表（含操作人与时间） |
+| POST | /api/v1/projects/:projectId/apis/:id/versions/:version/publish | 发布指定版本（回滚），需携带 `expectedVersion` |
 | POST | /api/v1/projects/:projectId/swagger/import | 导入 OpenAPI |
 | GET/DELETE | /api/v1/projects/:projectId/logs | 请求日志 / 清空 |
 | ANY | /mock/:projectId/*path | 公开 Mock 引擎 |

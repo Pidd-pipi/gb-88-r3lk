@@ -31,6 +31,23 @@ export interface MockAPI {
   responseHeaders: Record<string, string>;
   delay: number;
   conditions: ConditionRule[];
+  currentVersion: number;
+  createdAt: string;
+}
+
+export interface APIVersion {
+  _id: string;
+  apiId: string;
+  version: number;
+  path: string;
+  method: string;
+  statusCode: number;
+  responseBody: string;
+  responseHeaders: Record<string, string>;
+  delay: number;
+  conditions: ConditionRule[];
+  createdBy: string;
+  createdByName: string;
   createdAt: string;
 }
 
@@ -38,6 +55,7 @@ export interface RequestLog {
   _id: string;
   projectId: string;
   apiId?: string;
+  apiVersion: number;
   method: string;
   path: string;
   headers: Record<string, string>;

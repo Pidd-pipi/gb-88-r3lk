@@ -117,9 +117,11 @@ func (c *Config) AllowedOrigins() []string {
 	return out
 }
 
-// DSN builds the MySQL connection string.
+// DSN builds the MySQL connection string. clientFoundRows makes UPDATE
+// statements report matched (not just changed) rows, which the version
+// compare-and-swap relies on.
 func (c *Config) DSN() string {
-	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	return fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local&clientFoundRows=true",
 		c.MySQL.User, c.MySQL.Password, c.MySQL.Host, c.MySQL.Port, c.MySQL.Database)
 }
 
